@@ -1,0 +1,49 @@
+{
+    "name": "eumatheusgomes/febraban",
+    "description": "FEBRABAN layouts",
+    "type": "library",
+    "keywords": [
+        "cnab400",
+        "cnab240",
+        "layout",
+        "boleto",
+        "remessa",
+        "retorno"
+    ],
+    "homepage": "https://github.com/eumatheusgomes/febraban",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matheus Gomes",
+            "email": "eu@matheusgomes.com.br",
+            "homepage": "https://github.com/eumatheusgomes",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=5.4.0",
+        "eumatheusgomes/barcode": "^0.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "4.*",
+        "scrutinizer/ocular": "~1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "EuMatheusGomes\\Febraban\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EuMatheusGomes\\Febraban\\Test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

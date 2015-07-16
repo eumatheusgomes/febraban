@@ -2,36 +2,42 @@
 
 require '../vendor/autoload.php';
 
-use EuMatheusGomes\Febraban\Boleto\Sicoob;
 use EuMatheusGomes\Barcode\InterleavedTwoOfFive;
+use EuMatheusGomes\Febraban\Boleto\Sicoob;
+use EuMatheusGomes\Febraban\Boleto\Sacado;
+use EuMatheusGomes\Febraban\Boleto\Cedente;
 
 $itf = new InterleavedTwoOfFive();
-$sicoob = new Sicoob($itf);
 
+$sacado = new Sacado();
+$sacado->setNome('Consectetur Adipisicing Elit')
+    ->setEndereco('Tempor Incididunt Ut Labore')
+    ->setCidade('Nostrud Exercitation')
+    ->setUf('AZ')
+    ->setCep('99999-999')
+    ->setCpfCnpj('999.999.999-99');
+
+$cedente = new Cedente();
+$cedente->setNome('Consectetur Adipisicing Elit')
+    ->setCpfCnpj('999.999.999-99');
+
+$sicoob = new Sicoob($itf);
 $sicoob->setBanco(Sicoob::CODIGO_BANCO)
     ->setMoeda('9')
     ->setCarteira('1')
     ->setAgencia('9999')
     ->setModalidade('01')
-    ->setCedente('99999')
     ->setNossoNumero('99999')
     ->setNumeroParcela('1')
     ->setVencimento(date('Y-m-d'))
     ->setValor('999.99')
-    ->setNomeCedente('Lorem Ipsum Dolor Sit Amet')
+    ->setCodigoCedente('99999')
     ->setDataDocumento(date('Y-m-d'))
     ->setNumeroDocumento('99999')
     ->setEspecieDoc('DM')
     ->setEspecie('R$')
     ->setAceite('N')
     ->setDataProcessamento(date('Y-m-d'))
-    ->setSacadoNome('Consectetur Adipisicing Elit')
-    ->setSacadoEndereco('Tempor Incididunt Ut Labore')
-    ->setSacadoCidade('Nostrud Exercitation')
-    ->setSacadoUf('AZ')
-    ->setSacadoCep('99999-999')
-    ->setSacadoCpfCnpj('999.999.999-99')
-    ->setCedenteCpfCnpj('99.999.999/9999-99')
     ->setDemonstrativo([
         'Ut enim ad minim veniam',
         'Cillum dolore eu fugiat nulla pariatur',
@@ -44,6 +50,8 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
         '',
         'Quis nostrud ut aliquip ex ea commodo consequat velit esse'
     ])
+    ->setSacado($sacado)
+    ->setCedente($cedente);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -170,12 +178,12 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
               <tr>
                 <td class="brd-t brd-b brd-r" valign="top">
                   <small>Cedente</small>
-                  <strong class="left"><?= $sicoob->getNomeCedente() ?></strong>
+                  <strong class="left"><?= $sicoob->getCedente()->getNome() ?></strong>
                 </td>
                 <td class="brd-t brd-b brd-r" valign="top">
                   <small>Agência/Código do Cedente</small>
                   <strong class="right">
-                    <?= $sicoob->getAgencia() ?>/<?= str_pad($sicoob->getCedente(), 7, 0, STR_PAD_LEFT) ?>
+                    <?= $sicoob->getAgencia() ?>/<?= str_pad($sicoob->getCodigoCedente(), 7, 0, STR_PAD_LEFT) ?>
                   </strong>
                 </td>
                 <td class="brd-t brd-b brd-r" valign="top">
@@ -218,7 +226,7 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
                 <td class="brd-b brd-r" valign="top">
                   <small>CPF/CNPJ</small>
                   <strong class="right">
-                    <?= $sicoob->getCedenteCpfCnpj() ?>
+                    <?= $sicoob->getCedente()->getCpfCnpj() ?>
                   </strong>
                 </td>
                 <td class="brd-b brd-r" valign="top">
@@ -270,7 +278,7 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
         <tr>
           <td colspan="2" class="brd-b" valign="top">
             <small>Sacado</small>
-            <strong class="left"><?= $sicoob->getSacadoNome() ?></strong>
+            <strong class="left"><?= $sicoob->getSacado()->getNome() ?></strong>
           </td>
         </tr>
 
@@ -329,12 +337,12 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
         <tr>
           <td class="brd-t brd-b brd-r" valign="top">
             <small>Cedente</small>
-            <strong class="left"><?= $sicoob->getNomeCedente() ?></strong>
+            <strong class="left"><?= $sicoob->getCedente()->getNome() ?></strong>
           </td>
           <td class="brd-t brd-b brd-l" valign="top">
             <small>Agência/Código do Cedente</small>
             <strong class="right">
-              <?= $sicoob->getAgencia() ?>/<?= str_pad($sicoob->getCedente(), 7, 0, STR_PAD_LEFT) ?>
+              <?= $sicoob->getAgencia() ?>/<?= str_pad($sicoob->getCodigoCedente(), 7, 0, STR_PAD_LEFT) ?>
             </strong>
           </td>
         </tr>
@@ -459,11 +467,11 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
                 </td>
                 <td style="padding:0" valign="top">
                   <strong class="left">
-                    <?= $sicoob->getSacadoNome() ?><br>
-                    <?= $sicoob->getSacadoEndereco() ?><br>
-                    <?= $sicoob->getSacadoCidade() ?> -
-                    <?= $sicoob->getSacadoUf() ?> -
-                    <?= $sicoob->getSacadoCep() ?>
+                    <?= $sicoob->getSacado()->getNome() ?><br>
+                    <?= $sicoob->getSacado()->getEndereco() ?><br>
+                    <?= $sicoob->getSacado()->getCidade() ?> -
+                    <?= $sicoob->getSacado()->getUf() ?> -
+                    <?= $sicoob->getSacado()->getCep() ?>
                   </strong>
                 </td>
               </tr>
@@ -471,7 +479,7 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
           </td>
           <td valign="top">
             <small>CPF/CNPJ</small>
-            <strong class="left"><?= $sicoob->getSacadoCpfCnpj() ?></strong>
+            <strong class="left"><?= $sicoob->getSacado()->getCpfCnpj() ?></strong>
           </td>
         </tr>
         <tr>

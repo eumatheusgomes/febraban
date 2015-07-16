@@ -8,6 +8,10 @@ use EuMatheusGomes\Febraban\Boleto\Sacado;
 use EuMatheusGomes\Febraban\Boleto\Cedente;
 
 $itf = new InterleavedTwoOfFive();
+$itf->setImages([
+    'bar' => 'img/bar.png',
+    'space' => 'img/space.png'
+]);
 
 $sacado = new Sacado();
 $sacado->setNome('Consectetur Adipisicing Elit')

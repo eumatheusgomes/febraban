@@ -70,7 +70,16 @@ class Sicoob extends Boleto
 
     public function setNossoNumero($numeroSequencial = 1)
     {
+        foreach (['agencia', 'codigoCedente'] as $atributo) {
+            if (is_null($this->{$atributo})) {
+                throw new \InvalidArgumentException(
+                    "Atributo \"{$atributo}\" não pode ser nulo."
+                );
+            }
+        }
+
         $codigoCedente = str_replace('-', '', $this->codigoCedente);
+
         $this->nossoNumero = str_pad($numeroSequencial, 7, 0, STR_PAD_LEFT);
 
         $base  = $this->agencia;
@@ -90,11 +99,13 @@ class Sicoob extends Boleto
         $soma = array_sum($arrNossoNumero);
         $mod = $soma % 11;
 
+
+        $this->nossoNumeroDv = 0;
         if ($mod > 1 && $mod < 10) {
             $this->nossoNumeroDv = 11 - $mod;
         }
 
-        $this->nossoNumeroDv = 0;
+        $this->nossoNumero .= $this->nossoNumeroDv;
 
         return $this;
     }

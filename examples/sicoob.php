@@ -31,7 +31,6 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
     ->setCarteira('1')
     ->setAgencia('9999')
     ->setModalidade('01')
-    ->setNossoNumero('99999')
     ->setNumeroParcela('1')
     ->setVencimento(date('Y-m-d'))
     ->setValor('999.99')
@@ -42,6 +41,7 @@ $sicoob->setBanco(Sicoob::CODIGO_BANCO)
     ->setEspecie('R$')
     ->setAceite('N')
     ->setDataProcessamento(date('Y-m-d'))
+    ->setNossoNumero('99999')
     ->setDemonstrativo([
         'Ut enim ad minim veniam',
         'Cillum dolore eu fugiat nulla pariatur',

@@ -15,9 +15,6 @@ class Boleto
 
     const DATA_BASE = '2000-07-03';
 
-    protected $camposLinhaDigitavel = [];
-    protected $camposCodigoDeBarras = [];
-
     protected $itf;
     protected $sacado;
     protected $cedente;
@@ -48,6 +45,19 @@ class Boleto
         $this->itf = $itf;
     }
 
+    public function formata($atributo, $tamanho)
+    {
+        if (is_null($atributo)) {
+            throw new \InvalidArgumentException("O atributo \"{$atributo}\" não pode ser nulo.");
+        }
+
+        if (strlen($atributo) < $tamanho) {
+            $atributo = str_pad($atributo, $tamanho, 0, STR_PAD_LEFT);
+        }
+
+        return substr($atributo, 0, $tamanho);
+    }
+
     public function setVencimento($vencimento = null)
     {
         $this->vencimento = $vencimento;
@@ -74,88 +84,5 @@ class Boleto
     public function getValor()
     {
         return $this->valor / 100;
-    }
-
-    protected function calcDvCodigoDeBarras($campos)
-    {
-        return $this->mod11($campos, 2, 9);
-    }
-
-    protected function calcularCampoLinhaDigitavel($ordem)
-    {
-        $formato = $this->formatoLinhaDigitavel[$ordem];
-        $campo = '';
-
-        if (is_array($formato)) {
-            foreach ($formato as $parte) {
-                foreach ($parte as $atributo => $tamanho) {
-
-                    if (is_null($this->{$atributo})) {
-                        throw new \InvalidArgumentException(
-                            "Atributo \"{$atributo}\" não pode ser nulo."
-                        );
-                    }
-
-                    if (!is_array($tamanho)) {
-                        $tamanho = [0, $tamanho];
-                    }
-
-                    $params = array_merge([$this->{$atributo}], $tamanho);
-                    $atributo = call_user_func_array('substr', $params);
-
-                    if (strlen($atributo) < $tamanho[1]) {
-                        $atributo = str_pad($atributo, $tamanho[1], 0, STR_PAD_LEFT);
-                    }
-
-                    $campo .= $atributo;
-                }
-            }
-
-            if ($ordem != 5) {
-                $campo .= $this->mod10($campo);
-            }
-
-            return $campo;
-        } else {
-            $camposLinhaDigitavel = implode('', $this->camposLinhaDigitavel);
-            return $this->{$formato}($camposLinhaDigitavel);
-        }
-    }
-
-    protected function calcularCampoCodigoDeBarras($ordem)
-    {
-        $formato = $this->formatoCodigoDeBarras[$ordem];
-        $campo = '';
-
-        if (is_array($formato)) {
-            foreach ($formato as $parte) {
-                foreach ($parte as $atributo => $tamanho) {
-
-                    if (is_null($this->{$atributo})) {
-                        throw new \InvalidArgumentException(
-                            "Atributo \"{$atributo}\" não pode ser nulo."
-                        );
-                    }
-
-                    if (!is_array($tamanho)) {
-                        $tamanho = [0, $tamanho];
-                    }
-
-                    $params = array_merge([$this->{$atributo}], $tamanho);
-                    $atributo = call_user_func_array('substr', $params);
-
-                    if (strlen($atributo) < $tamanho[1]) {
-                        $atributo = str_pad($atributo, $tamanho[1], 0, STR_PAD_LEFT);
-                    }
-
-                    $campo .= $atributo;
-                }
-            }
-
-            return $campo;
-        } else {
-            $camposCodigoDeBarras = implode('', $this->camposCodigoDeBarras);
-            return $this->{$formato}($camposCodigoDeBarras);
-        }
     }
 }

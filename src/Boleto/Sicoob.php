@@ -8,57 +8,25 @@ class Sicoob extends Boleto
     const CONST_NOSSO_NUMERO = '3197';
     const CODIGO_BANCO = '756';
 
-    protected $formatoLinhaDigitavel = [
-        1 => [['banco' => 3], ['moeda' => 1], ['carteira' => 1], ['agencia' => 4]],
-        2 => [['modalidade' => 2], ['codigoCedente' => 7], ['nossoNumero' => 1]],
-        3 => [['nossoNumero' => [1, 7]], ['numeroParcela' => 3]],
-        5 => [['fatorVencimento' => 4], ['valor' => 10]],
-        4 => 'calcDvCodigoDeBarras',
-    ];
-
-    protected $formatoCodigoDeBarras = [
-        1 => [['banco' => 3]],
-        2 => [['moeda' => 1]],
-        4 => [['fatorVencimento' => 4]],
-        5 => [['valor' => 10]],
-        6 => [['carteira' => 1]],
-        7 => [['agencia' => 4]],
-        8 => [['modalidade' => 2]],
-        9 => [['codigoCedente' => 7]],
-        10 => [['nossoNumero' => 8]],
-        11 => [['numeroParcela' => 3]],
-        3 => 'calcDvCodigoDeBarras'
-    ];
-
-    public function linhaDigitavel($formatada = false)
-    {
-        foreach ($this->formatoLinhaDigitavel as $i => $v) {
-            $this->camposLinhaDigitavel[$i] = $this->calcularCampoLinhaDigitavel($i);
-        }
-
-        ksort($this->camposLinhaDigitavel);
-        if ($formatada) {
-
-            $linhaDigitavel  = substr_replace($this->camposLinhaDigitavel[1], '.', 5, 0) . ' ';
-            $linhaDigitavel .= substr_replace($this->camposLinhaDigitavel[2], '.', 5, 0) . ' ';
-            $linhaDigitavel .= substr_replace($this->camposLinhaDigitavel[3], '.', 5, 0) . ' ';
-            $linhaDigitavel .= $this->camposLinhaDigitavel[4] . ' ';
-            $linhaDigitavel .= $this->camposLinhaDigitavel[5];
-
-            return $linhaDigitavel;
-        }
-
-        return implode('', $this->camposLinhaDigitavel);
-    }
-
     public function codigoDeBarras($renderizar = false)
     {
-        foreach ($this->formatoCodigoDeBarras as $i => $v) {
-            $this->camposCodigoDeBarras[$i] = $this->calcularCampoCodigoDeBarras($i);
-        }
+        $codigoDeBarras = [
+            1  => $this->formata($this->banco, 3),
+            2  => $this->formata($this->moeda, 1),
+            4  => $this->formata($this->fatorVencimento, 4),
+            5  => $this->formata($this->valor, 10),
+            6  => $this->formata($this->carteira, 1),
+            7  => $this->formata($this->agencia, 4),
+            8  => $this->formata($this->modalidade, 2),
+            9  => $this->formata($this->codigoCedente, 7),
+            10 => $this->formata($this->nossoNumero, 8),
+            11 => $this->formata($this->numeroParcela, 3),
+        ];
 
-        ksort($this->camposCodigoDeBarras);
-        $codigoDeBarras = implode('', $this->camposCodigoDeBarras);
+        $codigoDeBarras[3]  = $this->mod11(implode('', $codigoDeBarras), 2, 9);
+
+        ksort($codigoDeBarras);
+        $codigoDeBarras = implode('', $codigoDeBarras);
 
         if ($renderizar) {
             return $this->itf->render($codigoDeBarras);
@@ -67,6 +35,41 @@ class Sicoob extends Boleto
         return $codigoDeBarras;
     }
 
+    public function linhaDigitavel($formatada = false)
+    {
+        $codigoDeBarras = $this->codigoDeBarras();
+
+        $linhaDigitavel[1]  = $this->banco;
+        $linhaDigitavel[1] .= $this->moeda;
+        $linhaDigitavel[1] .= $this->carteira;
+        $linhaDigitavel[1] .= $this->agencia;
+        $linhaDigitavel[1] .= $this->mod10($linhaDigitavel[1]);
+
+        $linhaDigitavel[2]  = $this->modalidade;
+        $linhaDigitavel[2] .= $this->formata($this->codigoCedente, 7);
+        $linhaDigitavel[2] .= substr($this->nossoNumero, 0, 1);
+        $linhaDigitavel[2] .= $this->mod10($linhaDigitavel[2]);
+
+        $linhaDigitavel[3]  = substr($this->nossoNumero, 1);
+        $linhaDigitavel[3] .= $this->formata($this->numeroParcela, 3);
+        $linhaDigitavel[3] .= $this->mod10($linhaDigitavel[3]);
+
+        $linhaDigitavel[4]  = substr($codigoDeBarras, 4, 1);
+
+        $linhaDigitavel[5]  = $this->fatorVencimento;
+        $linhaDigitavel[5] .= $this->formata($this->valor, 10);
+
+        $separador = '';
+        if ($formatada) {
+            $separador = ' ';
+
+            for ($i = 1; $i <= 3; $i++) {
+                $linhaDigitavel[$i] = substr_replace($linhaDigitavel[$i], '.', 5, 0);
+            }
+        }
+
+        return implode($separador, $linhaDigitavel);
+    }
 
     public function setNossoNumero($numeroSequencial = 1)
     {

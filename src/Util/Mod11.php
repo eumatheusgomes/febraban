@@ -12,7 +12,6 @@ trait Mod11
         $multiplier = implode('', $multiplier);
         $multiplier = str_repeat($multiplier, ceil(count($number) / strlen($multiplier)));
         $multiplier = substr($multiplier, 0, count($number));
-        $multiplier = strrev($multiplier);
         $multiplier = str_split($multiplier);
 
         foreach ($number as $i => $num) {
@@ -22,7 +21,7 @@ trait Mod11
         $sum = array_sum($number);
         $mod = $sum % 11;
 
-        if ($mod > 1 && $mod < 9) {
+        if ($mod > 1 && $mod <= 9) {
             return 11 - $mod;
         }
 

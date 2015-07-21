@@ -3,20 +3,23 @@ namespace EuMatheusGomes\Febraban\Util;
 
 trait Mod11
 {
-    public function mod11($number, $min, $max)
+    public function mod11($number, $multiplier, $default = 1)
     {
         $number = strrev($number);
         $number = str_split($number);
 
-        $multiplier = range($min, $max);
-        $multiplier = implode('', $multiplier);
-        $multiplier = str_repeat($multiplier, ceil(count($number) / strlen($multiplier)));
-        $multiplier = substr($multiplier, 0, count($number));
-        $multiplier = str_split($multiplier);
-
-        foreach ($number as $i => $num) {
-            $number[$i] = $num * $multiplier[$i];
+        if (count($multiplier) == 2) {
+            $multiplier = range($multiplier[0], $multiplier[1]);
         }
+
+        while (count($multiplier) < count($number)) {
+            $multiplier[] = current($multiplier);
+            next($multiplier);
+        }
+
+        $number = array_map(function ($n, $m) {
+            return $n * $m;
+        }, $number, $multiplier);
 
         $sum = array_sum($number);
         $mod = $sum % 11;
@@ -25,6 +28,6 @@ trait Mod11
             return 11 - $mod;
         }
 
-        return 1;
+        return $default;
     }
 }

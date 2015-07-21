@@ -23,7 +23,7 @@ class Sicoob extends Boleto
             11 => $this->formata($this->numeroParcela, 3),
         ];
 
-        $codigoDeBarras[3]  = $this->mod11(implode('', $codigoDeBarras), 2, 9);
+        $codigoDeBarras[3]  = $this->mod11(implode('', $codigoDeBarras), [2, 9]);
 
         ksort($codigoDeBarras);
         $codigoDeBarras = implode('', $codigoDeBarras);
@@ -73,6 +73,16 @@ class Sicoob extends Boleto
 
     public function setNossoNumero($numeroSequencial = 1)
     {
+        $this->nossoNumero = str_pad($numeroSequencial, 7, 0, STR_PAD_LEFT);
+        $this->nossoNumeroDv = $this->calculaNossoNumeroDv();
+
+        $this->nossoNumero .= $this->nossoNumeroDv;
+
+        return $this;
+    }
+
+    private function calculaNossoNumeroDv()
+    {
         foreach (['agencia', 'codigoCedente'] as $atributo) {
             if (is_null($this->{$atributo})) {
                 throw new \InvalidArgumentException(
@@ -83,33 +93,10 @@ class Sicoob extends Boleto
 
         $codigoCedente = str_replace('-', '', $this->codigoCedente);
 
-        $this->nossoNumero = str_pad($numeroSequencial, 7, 0, STR_PAD_LEFT);
-
         $base  = $this->agencia;
         $base .= str_pad($codigoCedente, 10, 0, STR_PAD_LEFT);
         $base .= $this->nossoNumero;
 
-        $multiplicador = str_repeat(self::CONST_NOSSO_NUMERO, 6);
-        $multiplicador = substr($multiplicador, 0, 21);
-
-        $arrBase = str_split($base);
-        $arrMultiplicador = str_split($multiplicador);
-
-        $arrNossoNumero = array_map(function ($f1, $f2) {
-            return $f1 * $f2;
-        }, $arrBase, $arrMultiplicador);
-
-        $soma = array_sum($arrNossoNumero);
-        $mod = $soma % 11;
-
-
-        $this->nossoNumeroDv = 0;
-        if ($mod > 1 && $mod < 10) {
-            $this->nossoNumeroDv = 11 - $mod;
-        }
-
-        $this->nossoNumero .= $this->nossoNumeroDv;
-
-        return $this;
+        return $this->mod11(strrev($base), str_split(self::CONST_NOSSO_NUMERO), 0);
     }
 }

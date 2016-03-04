@@ -94,4 +94,9 @@ class CaixaCr extends Boleto
         $carteiras = [9 => 'CR'];
         return $carteiras[$this->carteira];
     }
+
+    public function getNossoNumeroDv()
+    {
+        return $this->mod11($this->nossoNumero, [2, 9]);
+    }
 }

@@ -97,6 +97,6 @@ class CaixaCr extends Boleto
 
     public function getNossoNumeroDv()
     {
-        return $this->mod11($this->carteira . $this->nossoNumero, [2, 9]);
+        return $this->mod11($this->carteira . $this->nossoNumero, [2, 9], 0);
     }
 }
